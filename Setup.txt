@@ -1,0 +1,46 @@
+======================================================
+SMART AIRPORT ROVER - TEAM SETUP INSTRUCTIONS
+======================================================
+
+Welcome to the team! Before running any of the Capstone project code, you must set up an isolated Python Virtual Environment on your machine. This ensures our library versions match perfectly and the AI models run without crashing.
+
+Please follow these exact steps in your VS Code Terminal.
+
+---
+
+### STEP 1: Verify Your Folder
+Make sure you have downloaded the entire project folder, and that you have opened the `Capstone_Project` folder directly in VS Code.
+
+### STEP 2: Create the Virtual Environment
+Open a new Terminal in VS Code (Terminal > New Terminal) and run this command exactly to build the 'brain' folder:
+
+python -m venv rover_env
+
+*(Wait a few seconds for the 'rover_env' folder to appear on the left side of your screen).*
+
+### STEP 3: Activate the Environment
+You must "turn on" the environment before installing anything. Run this command:
+
+.\rover_env\Scripts\activate
+
+✅ SUCCESS CHECK: You should now see a green `(rover_env)` at the very beginning of your terminal typing line. 
+
+### STEP 4: Install the AI Libraries
+Now that the environment is active, we need to download the Google Speech and YOLOv8 Vision libraries. Run this single command:
+
+pip install -r requirements.txt
+
+*(This will take a few minutes. Let it download everything until the terminal stops scrolling).*
+
+======================================================
+🚨 TROUBLESHOOTING (For Windows Users)
+======================================================
+If Step 3 gives you a red error saying "Execution of scripts is disabled on this system", your Windows security is blocking the activation. 
+
+To fix this:
+1. Open your computer's Start Menu, type "PowerShell".
+2. Right-click "Windows PowerShell" and select "Run as Administrator".
+3. Paste this exact command and hit Enter: 
+   Set-ExecutionPolicy Unrestricted -Scope CurrentUser
+4. Type "Y" and hit Enter.
+5. Go back to VS Code and try Step 3 again!
