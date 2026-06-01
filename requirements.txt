@@ -13,3 +13,5 @@ folium
 streamlit-folium
 pandas
 plotly
+streamlit-webrtc
+pydub
