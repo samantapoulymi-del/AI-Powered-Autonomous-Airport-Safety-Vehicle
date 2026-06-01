@@ -5,7 +5,7 @@ import threading
 import speech_recognition as sr
 import asyncio
 import edge_tts
-import pygame
+# import pygame
 import uuid
 import time
 import psutil 
@@ -1094,32 +1094,16 @@ gps_lon            = _aeroguard_state["gps_lon"]
 VOICE_PROFILE  = "en-IN-NeerjaNeural"
 TARGET_CLASSES = [0, 2, 4, 7, 24, 28] 
 VIDEO_PLAYLIST = ['test_cargo.f399.mp4', 'test_etihad.f137.mp4', 'test_ramp.f401.mp4']
-pygame.mixer.init()
+#pygame.mixer.init()
 
 async def generate_audio(text, filename):
     communicate = edge_tts.Communicate(text, VOICE_PROFILE)
     await communicate.save(filename)
 
 def _speak_sync(text):
-    unique_audio_file = f"speech_{uuid.uuid4().hex}.mp3"
     print(f"\n🔊 [AEROGUARD]: {text}")
-    asyncio.run(generate_audio(text, unique_audio_file))
-    if pygame.mixer.music.get_busy():
-        pygame.mixer.music.stop()
-    try:
-        pygame.mixer.music.load(unique_audio_file)
-        pygame.mixer.music.play()
-        while pygame.mixer.music.get_busy():
-            pygame.time.Clock().tick(10)
-        pygame.mixer.music.unload()
-    except Exception:
-        pass
-    finally:
-        if os.path.exists(unique_audio_file):
-            try:
-                os.remove(unique_audio_file)
-            except:
-                pass
+    # Streamlit ক্লাউডে সাউন্ড প্লে হবে না, তাই সার্ভার ক্র্যাশ এড়াতে ক্লাউডের জন্য প্লেব্যাক কোডটি মিউট রাখা হলো
+    pass
 
 def speak(text):
     threading.Thread(target=_speak_sync, args=(text,), daemon=True).start()
