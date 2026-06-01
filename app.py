@@ -21,6 +21,31 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+from streamlit_webrtc import webrtc_streamer, WebRtcMode, AudioProcessorBase
+import pydub
+import numpy as np
+import io
+
+
+
+class SpeechAudioProcessor(AudioProcessorBase):
+    def __init__(self):
+        self.audio_frames = []
+        self.is_recording = False
+
+    def recv_audio(self, frame):
+        # যখন ইউজার কথা বলবে, অডিও ফ্রেমগুলো এখানে আসবে
+        if self.is_recording:
+            # অডিও ডেটা সংগ্রহ করা
+            sound = pydub.AudioSegment(
+                data=frame.to_ndarray().tobytes(),
+                sample_width=frame.format.bytes,
+                frame_rate=frame.sample_rate,
+                channels=len(frame.layout.channels),
+            )
+            self.audio_frames.append(sound)
+        return frame
+
 # --- STREAMLIT UI SETUP ---
 st.set_page_config(page_title="AeroGuard Master", layout="wide", page_icon="🛫")
 
@@ -1216,6 +1241,56 @@ def audio_engine():
                 pass
             except sr.RequestError as e:
                 print(f"❌ Speech API error: {e}")
+
+def voice_control_ui():
+    st.markdown("### 🎙️ Voice Command Center")
+    
+    webrtc_ctx = webrtc_streamer(
+        key="speech-to-text",
+        mode=WebRtcMode.SENDONLY,
+        audio_receiver_size=1024,
+        rtc_configuration={
+            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+        },
+        media_stream_constraints={"video": False, "audio": True},
+        audio_processor_factory=SpeechAudioProcessor,
+    )
+
+    status_indicator = st.empty()
+
+    if webrtc_ctx.state.playing:
+        status_indicator.success("🎙️ Microphone Active! Recording...")
+        webrtc_ctx.audio_processor.is_recording = True
+        
+        if st.button("Stop Recording & Analyze"):
+            webrtc_ctx.audio_processor.is_recording = False
+            status_indicator.warning("Processing Audio...")
+            
+            if webrtc_ctx.audio_processor.audio_frames:
+                full_audio = sum(webrtc_ctx.audio_processor.audio_frames)
+                wav_io = io.BytesIO()
+                full_audio.export(wav_io, format="wav")
+                wav_io.seek(0)
+                
+                recognizer = sr.Recognizer()
+                with sr.AudioFile(wav_io) as source:
+                    audio_data = recognizer.record(source)
+                    try:
+                        text = recognizer.recognize_google(audio_data)
+                        st.write(f"🗣️ You said: **{text}**")
+                        
+                        # আপনার Groq LLM-কে কমান্ড পাঠাতে চাইলে নিচের ২ লাইন থেকে # সরিয়ে দেবেন
+                        # command_json = extract_intent(text)
+                        # st.write(f"🤖 AI Intent: {command_json}")
+                        
+                    except sr.UnknownValueError:
+                        st.error("Could not understand audio.")
+                    except sr.RequestError as e:
+                        st.error(f"Speech recognition error: {e}")
+            else:
+                 st.info("No audio recorded.")
+    else:
+        status_indicator.info("Click 'START' on the player above to allow microphone access.")
 
 def vision_engine():
     st.markdown("### 🎛️ Live Vision Engine Controls")
