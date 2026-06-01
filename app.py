@@ -1049,8 +1049,7 @@ with nav_container:
 def load_ai_model():
     return YOLO('yolov8n.pt')
 
-groq_client = Groq(api_key="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")
-
+groq_client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 # ── THREAD-SAFE SHARED STATE ─────────────────────────────────────────────────
 # Uses a module-level dict (created once per interpreter process) plus a Queue
 # so the audio daemon thread can push state updates that the vision loop picks
