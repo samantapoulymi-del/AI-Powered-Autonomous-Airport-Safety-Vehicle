@@ -1354,9 +1354,14 @@ def vision_engine():
 
         telemetry_y = h - 120
         cv2.putText(annotated_frame, f"FPS: {int(actual_fps)}", (20, telemetry_y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 2)
-        battery      = psutil.sensors_battery()
-        battery_level= battery.percent if battery else 100.0
-        power_status = ("[AC]" if battery.power_plugged else "[BATT]") if battery else "[AC]"
+        try:
+            battery = psutil.sensors_battery()
+            battery_level = battery.percent if battery else 100.0
+            power_status = ("[AC]" if battery.power_plugged else "[BATT]") if battery else "[AC]"
+        except Exception:
+            # If running on cloud where battery info doesn't exist
+            battery_level = 100.0
+            power_status = "[AC]"
         bat_color    = (0, 255, 0) if battery_level > 20 else (0, 0, 255)
         cv2.putText(annotated_frame, f"PWR: {battery_level:.0f}% {power_status}", (20, telemetry_y + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, bat_color, 2)
         cv2.putText(annotated_frame, f"GPS: {gps_lat:.5f}, {gps_lon:.5f}",        (20, telemetry_y + 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 200, 0), 2)
