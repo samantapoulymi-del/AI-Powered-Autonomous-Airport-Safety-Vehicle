@@ -1,5 +1,4 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
-
 torch
 torchvision
 streamlit
@@ -8,7 +7,7 @@ SpeechRecognition
 edge-tts
 psutil
 groq
-rapidfuzz
+RapidFuzz
 ultralytics
 folium
 streamlit-folium
